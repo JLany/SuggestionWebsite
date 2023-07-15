@@ -1,0 +1,30 @@
+Category:
+- CategoryName
+- CategoryDescription
+
+
+Status:
+- StatusName
+- StatusDescription
+
+
+User:
+- ObjectId (Azure Identifier)
+- FirstName
+- LastName
+- DisplayName
+- EmailAddress
+- AuthoredPosts
+- VotedOnPosts
+
+
+Post:
+- Title
+- Description
+- DateCreated
+- Category
+- ListingStatus
+- Author
+- UserVotes
+- AdminNotes
+- ApprovalStatus

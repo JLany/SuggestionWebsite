@@ -1,0 +1,8 @@
+Blazor Server
+Azure Active Directory B2C
+MongoDB
+Virtualize
+In-Memory Caching
+HTML
+CSS 
+Bootstrap 5

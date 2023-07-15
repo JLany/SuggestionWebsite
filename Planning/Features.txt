@@ -1,0 +1,16 @@
+VERSION 1 FEATURES:
+- Approve/Deny posts as an admin.
+- Add status to a post with a note, as an admin.
+- Archive posts as an admin.
+- Admin Approval Screen. 
+- Authentication/Authorization.
+- User Profile Page.
+- Track user votes.
+- Login/Account/Logout options.
+- Limit the size of the title and description of a post.
+
+
+
+FUTURE VERSIONS FEATURES:
+- Add Categories.
+- Add Statuses.

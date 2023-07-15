@@ -1,0 +1,37 @@
+1 ) Do we want authentication/authorization?
+
+2 ) Do we want to limit what a person can post? (e.g. post rate, offensive)
+
+3 ) Offensive content filter?
+
+4 ) Can we add new categories/statuses? 
+
+5 ) How to know weather a post is posted?
+
+6 ) How does the system know if I have voted on a post?
+
+7 ) Can a user vote on their own post? (NO)
+
+8 ) Should title/post size be limited?
+
+9 ) How do admins add status to a post?
+
+10) What happenst when the list gets huge?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
