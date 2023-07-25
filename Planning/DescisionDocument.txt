@@ -1,0 +1,3 @@
+Database Connection:
+Maintain an open database connction throughout the lifetime of the application.
+

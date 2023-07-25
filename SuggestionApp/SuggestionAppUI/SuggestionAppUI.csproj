@@ -2,9 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dd319b2b-8546-45e9-8851-fe27aa1401a1</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="Pages\SampleData.razor" />
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Components\" />
@@ -19,6 +23,18 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SuggestionAppLibrary\SuggestionAppLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Pages\SampleData.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\SampleData.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Pages\SampleData.razor" />
   </ItemGroup>
 
 </Project>
