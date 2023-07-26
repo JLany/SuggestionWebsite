@@ -102,9 +102,10 @@ public class MongoPostRepository : IPostRepository
         {
             UserModel user = await _userRepository.GetUserAsync(post.Author.Id);
 
+            await _posts.InsertOneAsync(post);
+
             user.AuthoredPosts.Add(new UserPostViewModel(post));
 
-            await _posts.InsertOneAsync(post);
             await _userRepository.UpdateUserAsync(user);
 
             await session.CommitTransactionAsync();
