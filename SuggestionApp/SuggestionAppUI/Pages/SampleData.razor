@@ -1,6 +1,8 @@
 ﻿@page "/SampleData"
 @inject ICategoryRepository categoryRepo
 @inject IStatusRepository statusRepo
+@inject IUserRepository userRepo
+@inject IPostRepository postRepo
 
 <h3>Sample Data</h3>
 
@@ -8,24 +10,101 @@
 {
 	<h4>Categories have been created.</h4>
 }
-else 
+else
 {
-	<button class="btn btn-primary" onclick="CreateCategories">Create Categories</button>
+	<button class="btn btn-primary" @onclick="CreateCategories">Create Categories</button>
 }
 
 @if (_statusesCreated)
 {
 	<h4>Statueses have been created.</h4>
 }
-else 
+else
 {
-	<button class="btn btn-primary" onclick="CreateStatuses">Create Statuses</button>
+	<button class="btn btn-primary" @onclick="CreateStatuses">Create Statuses</button>
 }
+
+<button class="btn btn-primary" @onclick="CreateSamplePosts">Create Sample Posts</button>
 
 
 @code {
 	private bool _categoriesCreated = false;
 	private bool _statusesCreated = false;
+
+	private async Task CreateSamplePosts()
+	{
+		var user = new UserModel
+		{
+			FirstName = "Yousef",
+			LastName = "Kilany",
+			DisplayName = "Sample User",
+			EmailAddress = "kdev@csharp.net",
+			ObjectIdentifier = "abc-555"
+		};
+
+		await userRepo.CreateUserAsync(user);
+
+		user = await userRepo.GetUserFromAuthenticationAsync("abc-555");
+
+		var votes = new HashSet<string>
+		{
+			"1",
+			"2",
+			"3",
+		};
+
+		var categories = await categoryRepo.GetCategoriesAsync();
+		var statuses = await statusRepo.GetStatusesAsync();
+
+		await postRepo.CreatePostAsync(new PostModel
+		{
+			Author = new PostAuthorViewModel(user),
+			Category = categories[0],
+			Title = "First Post",
+			Description = "This is a sample post to test out the site."
+		});
+		await postRepo.CreatePostAsync(new PostModel
+		{
+			Author = new PostAuthorViewModel(user),
+			Category = categories[1],
+			Title = "Second Post",
+			Description = "This is a sample post to test out the site.",
+			Status = statuses[0],
+			AdminNotes = "This is the admin note."
+		});
+		await postRepo.CreatePostAsync(new PostModel
+		{
+			Author = new PostAuthorViewModel(user),
+			Category = categories[2],
+			Title = "Third Post",
+			Description = "This is a sample post to test out the site.",
+			Status = statuses[1],
+			AdminNotes = "This is the admin note."
+		});
+		await postRepo.CreatePostAsync(new PostModel
+		{
+			Author = new PostAuthorViewModel(user),
+			Category = categories[3],
+			Title = "A Post",
+			Description = "This is a sample post to test out the site.",
+			Status = statuses[2],
+			UserVotes = votes,
+			AdminNotes = "This is the admin note."
+		});
+
+		votes.Add("555");
+
+		await postRepo.CreatePostAsync(new PostModel
+		{
+			Author = new PostAuthorViewModel(user),
+			Category = categories[4],
+			Title = "Not Counting Anymore Post",
+			Description = "This is a sample post to test out the site.",
+			Status = statuses[3],
+			UserVotes = votes,
+			AdminNotes = "This is the admin note."
+		});
+	}
 
 	private async Task CreateCategories()
 	{
@@ -33,6 +112,7 @@ else
 
 		if (categories?.Count > 0)
 		{
+			_categoriesCreated = true;
 			return;
 		}
 
@@ -71,6 +151,7 @@ else
 
 		if (statuses?.Count > 0)
 		{
+			_statusesCreated = true;
 			return;
 		}
 
