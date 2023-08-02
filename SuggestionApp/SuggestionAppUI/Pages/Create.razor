@@ -1,0 +1,103 @@
+﻿@page "/Create"
+@using SuggestionAppUI.Components
+@using SuggestionAppUI.Models;
+@inject ICategoryRepository categoryRepo
+@inject IPostRepository postRepo
+@inject IUserRepository userRepo
+@inject NavigationManager navigation
+
+<h1>Make A Suggestion</h1>
+
+<div>
+	<div>
+		<div>
+			<button @onclick="ClosePage"></button>
+		</div>
+
+		<div>
+			@if (_categories is not null)
+			{
+				<EditForm Model="_postDto" OnValidSubmit="CreatePostAsync">
+					<DataAnnotationsValidator />
+					<ValidationSummary />
+
+					<div>
+						<label for="title">Title</label>
+						<div>Focus on the topic or technology you want to learn about.</div>
+						<InputText id="title" @bind-Value="_postDto.Title" />
+					</div>
+					<div>
+						<label for="category">Category</label>
+						<div>Choose one category.</div>
+						<div>
+						<CustomInputRadioGroup id="category" @bind-Value="_postDto.CategoryId">
+							@foreach (var category in _categories)
+							{
+								<div>
+									<InputRadio Value="category.Id" id="@category.Id" />
+									<label for="@category.Id">
+										@category.CategoryName - @category.CategoryDescription
+									</label>
+								</div>
+							}
+						</CustomInputRadioGroup>
+						</div>
+					</div>
+					<div>
+						<label for="description">Description</label>
+						<div>Briefly describe your suggestion.</div>
+						<InputTextArea id="description" @bind-Value="_postDto.Description" />
+					</div>
+					<div>
+						<button type="submit">Suggest!</button>
+					</div>
+				</EditForm>
+			}
+		</div>
+	</div>
+</div>
+
+@code {
+	private CreatePostDto _postDto = new();
+	private List<CategoryModel> _categories;
+	private UserModel _loggedInUser;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_categories = await categoryRepo.GetCategoriesAsync();
+
+		// TODO - Replace with actual user retrieval.
+		_loggedInUser = await userRepo.GetUserFromAuthenticationAsync("abc-555");
+	}
+
+	private void ClosePage()
+	{
+		navigation.NavigateTo("/");
+	}
+
+	private async Task CreatePostAsync()
+	{
+		var post = new PostModel
+			{
+				Title = _postDto.Title,
+				Description = _postDto.Description,
+				Category = _categories
+					.Where(c => c.Id == _postDto.CategoryId).FirstOrDefault(),
+				Author = new PostAuthorViewModel(_loggedInUser),
+			};
+
+		if (post.Category is null)
+		{
+			_postDto.CategoryId = "";
+		}
+
+		Task createTask = postRepo.CreatePostAsync(post);
+
+		_postDto = new();
+
+		ClosePage();
+		
+		// Better performance. For the page not to freeze before navigating to Index.
+		await createTask;
+	}
+}
