@@ -56,7 +56,7 @@
 		{
 			<div>
 				<span>Category</span>
-				<div @onclick="(() => OnCategoryClickAsync(CategoryModel.None))">All</div>
+				<div @onclick="(() => OnCategoryClickAsync(CategoryModel.All))">All</div>
 				@foreach (var c in _categories)
 				{
 					<div @onclick="(() => OnCategoryClickAsync(c.CategoryName))">@c.CategoryName</div>
@@ -83,7 +83,7 @@
 	private List<StatusModel> _statuses;
 	private List<PostModel> _posts;
 
-	private string _selectedCategory = CategoryModel.None;
+	private string _selectedCategory = CategoryModel.All;
 	private string _selectedStatus = StatusModel.None;
 	private string _searchText = "";
 	private SortOption _sortOption = SortOption.ByNew;
@@ -106,7 +106,7 @@
 
 	private async Task LoadFilterStateAsync()
 	{
-		_selectedCategory = await GetFromSessionStorageAsync(nameof(_selectedCategory), CategoryModel.None);
+		_selectedCategory = await GetFromSessionStorageAsync(nameof(_selectedCategory), CategoryModel.All);
 		_selectedStatus = await GetFromSessionStorageAsync(nameof(_selectedStatus), StatusModel.None);
 		_searchText = await GetFromSessionStorageAsync(nameof(_searchText), "");
 		_sortOption = await GetFromSessionStorageAsync(nameof(_sortOption), SortOption.ByNew);
@@ -132,7 +132,7 @@
 	{
 		IEnumerable<PostModel> posts = await postRepo.GetPostsAsync(ApprovalStatus.Approved);
 
-		if (_selectedCategory != CategoryModel.None)
+		if (_selectedCategory != CategoryModel.All)
 		{
 			posts = posts.Where(p => p.Category?.CategoryName == _selectedCategory);
 		}
