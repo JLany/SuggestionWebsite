@@ -1,0 +1,93 @@
+﻿@page "/Details/{Id}"
+@inject IPostRepository postRepo
+@inject NavigationManager navigation
+
+<h1>Suggestion Details</h1>
+
+<div>
+	<div>
+		@if (_post is not null) 
+		{
+			<div>
+				<div>
+					<div>
+						<div>@UpvoteTopText()</div>
+						<span class="oi oi-caret-top"></span>
+						<div>@UpvoteBottomText()</div>
+					</div>
+					<div>
+						<div>@_post.DateCreated.ToString("MM.dd.yyyy")</div>
+					</div>
+				</div>
+
+				<div>
+					<div>@_post.Title</div>
+					<div>@_post.Author.DisplayName</div>
+					<div>@_post.Description</div>
+					<div>@_post.Category?.CategoryName</div>
+				</div>
+			</div>
+		}
+
+		<div>
+			<button @onclick="ClosePage"></button>
+		</div>
+	</div>
+
+	<div>
+		@if (_post?.Status is not null)
+		{
+			<div>
+				<div>
+					<div></div>
+					<div>
+						<div>@_post.Status.StatusName</div>
+						<div>@((MarkupString)_post.AdminNotes)</div>
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public string Id { get; set; }
+
+	private PostModel _post;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_post = await postRepo.GetPostAsync(Id);
+	}
+
+	private void ClosePage()
+	{
+		navigation.NavigateTo("/");
+	}
+
+	private string UpvoteTopText()
+	{
+		if (_post.UserVotes.Count > 0)
+		{
+			return _post.UserVotes.Count.ToString("00");
+		}
+		else
+		{
+			return "Click To";
+		}
+	}
+
+	private string UpvoteBottomText()
+	{
+		if (_post.UserVotes.Count > 1)
+		{
+			return "Upvotes";
+		}
+		else
+		{
+			return "Upvote";
+		}
+	}
+
+}
