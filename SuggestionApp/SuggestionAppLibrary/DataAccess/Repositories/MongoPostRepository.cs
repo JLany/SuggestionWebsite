@@ -10,7 +10,8 @@ public class MongoPostRepository : IPostRepository
     private readonly IMongoCollection<PostModel> _posts;
     private const string CacheKey = "Posts";
 
-    public MongoPostRepository(IDbConnection dbConnection, IUserRepository userRepository, IMemoryCache cache)
+    public MongoPostRepository(IDbConnection dbConnection
+        , IUserRepository userRepository, IMemoryCache cache)
     {
         _dbConnection = dbConnection;
         _userRepository = userRepository;
@@ -18,6 +19,10 @@ public class MongoPostRepository : IPostRepository
         _posts = _dbConnection.PostCollection;
     }
 
+    /// <summary>
+    /// Get all posts.
+    /// </summary>
+    /// <returns></returns>
     public async Task<List<PostModel>> GetPostsAsync()
     {
         var output = _cache.Get<List<PostModel>>(CacheKey);
@@ -34,11 +39,36 @@ public class MongoPostRepository : IPostRepository
         return output;
     }
 
+    /// <summary>
+    /// Get all posts with the specified <see cref="ApprovalStatus"/>.
+    /// </summary>
+    /// <param name="approvalStatus"></param>
+    /// <returns></returns>
     public async Task<List<PostModel>> GetPostsAsync(ApprovalStatus approvalStatus)
     {
         return (await GetPostsAsync())
             .Where(p => p.ApprovalStatus == approvalStatus)
             .ToList();
+    }
+
+    /// <summary>
+    /// Get all posts for a the <see cref="UserModel"/> with the specified Id.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    public async Task<List<PostModel>> GetPostsAsync(string userId)
+    {
+        var output = _cache.Get<List<PostModel>>(userId);
+
+        if (output is null)
+        {
+            var result = await _posts.FindAsync(p => p.Author.Id == userId);
+            output = result.ToList();
+
+            _cache.Set(userId, output, TimeSpan.FromMinutes(5));
+        }
+
+        return output;
     }
 
     public async Task<PostModel> GetPostAsync(string id)
@@ -51,6 +81,7 @@ public class MongoPostRepository : IPostRepository
     {
         await _posts.ReplaceOneAsync(p => p.Id == post.Id, post);
         _cache.Remove(CacheKey);
+        _cache.Remove(post.Author.Id);
     }
 
     public async Task UpvotePostAsync(string postId, string userId)
@@ -107,6 +138,8 @@ public class MongoPostRepository : IPostRepository
             user.AuthoredPosts.Add(new UserPostViewModel(post));
 
             await _userRepository.UpdateUserAsync(user);
+
+            _cache.Remove(post.Author.Id);
 
             await session.CommitTransactionAsync();
         }

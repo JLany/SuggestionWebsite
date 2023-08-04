@@ -6,7 +6,8 @@
         Task<PostModel> GetPostAsync(string id);
         Task<List<PostModel>> GetPostsAsync();
         Task<List<PostModel>> GetPostsAsync(ApprovalStatus approvalStatus);
-        Task UpdatePostAsync(PostModel post);
+		Task<List<PostModel>> GetPostsAsync(string userId);
+		Task UpdatePostAsync(PostModel post);
         Task UpvotePostAsync(string postId, string userId);
     }
 }

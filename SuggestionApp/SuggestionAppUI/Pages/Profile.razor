@@ -1,0 +1,105 @@
+﻿@page "/Profile"
+@inject IUserRepository userRepo
+@inject IPostRepository postRepo
+@inject NavigationManager navigation
+
+<h1>My Profile</h1>
+
+<div>
+	<div>
+		<button @onclick="ClosePage"></button>
+	</div>
+</div>
+
+<div>
+	<h2>My Account</h2>
+	<p>
+		<p>
+			<a href="#">
+				Edit My Profile
+			</a>
+		</p>
+	</p>
+</div>
+
+<div>
+	@foreach (var list in _postLists)
+	{
+		if (list.Posts?.Count() > 0)
+		{
+			<div>
+				<h2>@list.Name Suggestions</h2>
+				<p>@list.Note</p>
+
+				@foreach (var post in list.Posts) 
+				{
+					<hr />
+					<div>
+						@post.Title
+					</div>
+					<p>
+						@post.DateCreated.ToString("MM.dd.yyyy")
+					</p>
+					<p>
+						Total Votes: @post.UserVotes.Count
+					</p>
+					<p>
+						@post.Category.CategoryName
+					</p>
+					<p>
+						@post.Description
+					</p>
+
+					if (post.Status is not null) 
+					{
+						<div>
+							@post.Status.StatusName
+						</div>
+						<p>
+							@((MarkupString)post.AdminNotes)
+						</p>
+					}
+				}
+			</div>
+		}
+	}
+</div>
+
+@code {
+	private UserModel _loggedInUser;
+
+	private List<(string Name, string Note, IEnumerable<PostModel> Posts)> _postLists = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		// TODO - Replace with actual user retrieval.
+		_loggedInUser = await userRepo.GetUserFromAuthenticationAsync("abc-555");
+
+		var posts = await postRepo.GetPostsAsync(_loggedInUser.Id);
+
+		_postLists.Add(
+			("Approved", "These are your suggestions that are currently active."
+				, posts.Where(p => p.ApprovalStatus == ApprovalStatus.Approved))
+		);
+
+		_postLists.Add(
+			("Archived", "These are your suggestions that were active but did not gain enough traction."
+				, posts.Where(p => p.ApprovalStatus == ApprovalStatus.Archived))
+		);
+
+		_postLists.Add(
+			("Pending", "These are your suggestions that have not been reviewed by the administrators."
+				, posts.Where(p => p.ApprovalStatus == ApprovalStatus.Pending))
+		);
+
+		_postLists.Add(
+			("Rejected", "These are your suggestions that did not meet our policies of secure and approprieate content."
+				, posts.Where(p => p.ApprovalStatus == ApprovalStatus.Rejected))
+		);
+	}
+
+	private void ClosePage()
+	{
+		navigation.NavigateTo("/");
+	}
+}
