@@ -8,6 +8,7 @@ public static class ConfigureServices
         builder.Services.AddServerSideBlazor();
 
         builder.Services.AddMemoryCache();
+
         builder.Services.AddSingleton<IDbConnection, DbConnection>();
 
         builder.Services.AddSingleton<ICategoryRepository, MongoCategoryRepository>();
